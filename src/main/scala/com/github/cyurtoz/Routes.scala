@@ -1,10 +1,8 @@
 package com.github.cyurtoz
 
 import akka.http.scaladsl.server.Directives._
-import com.github.cyurtoz.api.UsersApi
+import com.github.cyurtoz.api.MoviesApi
 
-trait Routes extends UsersApi {
-  val routes = pathPrefix("v1") {
-    usersRoutes
-  } ~ path("")(getFromResource("public/index.html"))
+trait Routes extends MoviesApi {
+
 }
