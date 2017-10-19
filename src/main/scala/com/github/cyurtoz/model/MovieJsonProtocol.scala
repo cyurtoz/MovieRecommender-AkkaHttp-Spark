@@ -9,6 +9,9 @@ import spray.json.{DefaultJsonProtocol, JsArray, JsNumber, JsString, JsValue, Ro
 object MovieJsonProtocol extends DefaultJsonProtocol {
 
   implicit object MovieJsonFormat extends RootJsonFormat[Movie] {
+
+    var idIncrementer = 0
+
     def write(c: Movie) =
       JsArray(JsString(c.director_name),
         JsNumber(c.director_facebook_likes),
@@ -70,7 +73,10 @@ object MovieJsonProtocol extends DefaultJsonProtocol {
 
       val fields = value.asJsObject.fields
 
+      idIncrementer = idIncrementer + 1
+
       Movie(
+        idIncrementer,
         fields.get("color").map(toString).get,
         fields.get("director_name").map(toString).get,
         fields.get("num_critic_for_reviews").map(toLong).get,
@@ -100,6 +106,8 @@ object MovieJsonProtocol extends DefaultJsonProtocol {
         fields.get("aspect_ratio").map(toDouble).get,
         fields.get("movie_facebook_likes").map(toLong).get
       )
+
+
 
     }
   }

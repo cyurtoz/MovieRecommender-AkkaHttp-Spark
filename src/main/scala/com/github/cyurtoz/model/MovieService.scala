@@ -9,13 +9,17 @@ import spray.json._
   */
 object MovieService {
 
-  def get(id:String): Movie = {
+  val movies: List[Movie] = {
     val lines = scala.io.Source.fromInputStream(MovieService.getClass.getResourceAsStream("/data.json")).mkString
     implicit val movieFormat: MovieJsonProtocol.MovieJsonFormat.type = MovieJsonProtocol.MovieJsonFormat
-    val movies: List[Movie] = lines.parseJson.convertTo[List[Movie]].filter(p => p != null)
-    println("movies = " + movies.length)
+     lines.parseJson.convertTo[List[Movie]].filter(p => p != null)
+  }
 
-    movies(Integer.parseInt(id))
+  def get(id:String) = {
+    movies.find(_.id == Integer.parseInt(id)) match {
+      case Some(mv) => mv
+      case _ => "Not Found"
+    }
   }
 
 

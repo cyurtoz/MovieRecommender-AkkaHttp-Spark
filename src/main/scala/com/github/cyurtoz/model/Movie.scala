@@ -5,6 +5,7 @@ package com.github.cyurtoz.model
   *
   */
 case class Movie(
+                  id: Int,
                   color: String,
                   director_name: String,
                   num_critic_for_reviews: Long,
