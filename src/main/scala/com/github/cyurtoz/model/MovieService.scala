@@ -15,12 +15,20 @@ object MovieService {
      lines.parseJson.convertTo[List[Movie]].filter(p => p != null)
   }
 
-  def get(id:String) = {
-    movies.find(_.id == Integer.parseInt(id)) match {
-      case Some(mv) => mv
+  def get(id:String):String = {
+    val idInt = Integer.parseInt(id)
+    movies.find(_.id == idInt) match {
+      case Some(mv) => mv.toString
       case _ => "Not Found"
     }
   }
 
+
+  def getName(id:Long):String = {
+    movies.find(_.id.longValue() == id.longValue()) match {
+      case Some(mv) => mv.movie_title
+      case _ => "Not Found"
+    }
+  }
 
 }

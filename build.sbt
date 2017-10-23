@@ -6,7 +6,7 @@ scalaVersion := "2.11.8"
 
 val sparkVersion = "2.2.0"
 
-lazy val root = (project in file(".")).enablePlugins(JavaAppPackaging)
+lazy val akkahttp = (project in file(".")).enablePlugins(JavaAppPackaging)
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
@@ -22,6 +22,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamVersion,
     "org.scalatest"     %% "scalatest"                            % "2.2.5" % "test",
     "com.typesafe.akka" %% "akka-testkit"                         % akkaVersion % "test"
+
   )
 }
 
@@ -32,6 +33,8 @@ libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersion
 libraryDependencies += "org.apache.spark" % "spark-mllib_2.11" % sparkVersion
 
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.3"
+
+libraryDependencies += "com.github.etaty" % "rediscala_2.11" % "1.8.0"
 
 packageName in Docker := "akka-http-spark"
 dockerExposedPorts := Seq(9911)
