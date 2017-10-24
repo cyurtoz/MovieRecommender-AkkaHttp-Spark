@@ -21,7 +21,7 @@ trait MoviesApi extends BearerTokenGenerator {
     } ~
       (path("train") & get) {
         complete {
-          val mvv: Array[Recommendation] = MoviesRecommender.trainn
+          val mvv: Array[Recommendation] = MoviesRecommender.model
           val mv = mvv.map(x => (MovieService.getName(x.movieId),
             x.recommendationIds.map(z => MovieService.getName(z))))
 

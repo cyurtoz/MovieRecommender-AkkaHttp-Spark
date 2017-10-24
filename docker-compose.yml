@@ -1,0 +1,12 @@
+version: '3'
+services:
+  akkahttp:
+    image: "akka-http-spark:0.0.1"
+    ports:
+    - "9911:9911"
+    environment:
+      - spark.executor.memory = 4g
+  redis:
+    image: "redis:alpine"
+    ports:
+     - "6379:6379"

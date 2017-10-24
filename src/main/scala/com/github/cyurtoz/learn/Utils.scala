@@ -9,31 +9,41 @@ import org.apache.spark.rdd.RDD
   *
   */
 object Utils {
+  def extractLanguages(movies: List[Movie]): List[String] = {
+    movies.map(_.language).distinct
+  }
+
+  def extractCountries(movies: List[Movie]): List[String] = {
+    movies.map(_.country).distinct
+  }
 
   def splitTestAndTraining(movies: RDD[Movie]): (RDD[Movie], RDD[Movie]) = {
     val split = movies.randomSplit(Array(0.7, 0.3))
     (split(0), split(1))
   }
 
-  def extractGenres(moviesRDD: List[Movie]) = {
+  def extractGenres(moviesRDD: List[Movie]): Array[String] = {
     moviesRDD.flatMap(_.genres.split('|')).distinct.toArray
   }
 
-
-  def extractMovieFeaturesVector(mv: Movie, genres: Array[String]): Array[Double] = {
+  def extractMovieFeaturesVector(mv: Movie, genres: Array[String], countries: List[String], languages: List[String])
+  : Array[Double] = {
     val mvGenres = genres.map(x => if (mv.genres.contains(x)) 1d else 0d)
+    val mvCountry = countries.map(x => if (x.equals(mv.country)) 1d else 0d)
+    val mvLanguages = languages.map(x => if (x.equals(mv.language)) 1d else 0d)
+
     val arr = List(
       mv.imdb_score,
       mv.movie_facebook_likes,
       mv.num_critic_for_reviews,
       mv.num_user_for_reviews,
       mv.num_voted_users,
-      mv.cast_total_facebook_likes.toDouble,
       mv.director_facebook_likes.toDouble,
-      mv.gross
+      mv.gross,
+      mv.duration
     ).toArray
 
-    arr ++ mvGenres
+    arr ++ mvGenres ++ mvCountry ++ mvLanguages
 
   }
 }
