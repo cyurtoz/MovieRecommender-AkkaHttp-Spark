@@ -4,8 +4,7 @@ import akka.util.ByteString
 import com.github.cyurtoz.model.Recommendation
 import redis.{ByteStringFormatter, RedisClient}
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
+import scala.concurrent.Future
 
 /**
   * Created by cyurtoz on 22/10/17.
@@ -29,12 +28,16 @@ object RedisRepoImpl {
     }
   }
 
-  def save(recom:Recommendation): Unit = {
-    val asd = redis.lpush(String.valueOf(recom.movieId), recom)
+  def saveAll(mappedRecommendations: Array[Recommendation]): Unit = {
+    mappedRecommendations.foreach(rec => save(rec))
   }
 
-  def get(movieId:Long): Unit = {
-    redis.lpop(String.valueOf(movieId))
+  def save(recom: Recommendation): Unit = {
+    redis.set(String.valueOf(recom.movieId), recom)
+  }
+
+  def get(movieId: Long): Future[Option[Recommendation]] = {
+    redis.get(String.valueOf(movieId))
   }
 
 }

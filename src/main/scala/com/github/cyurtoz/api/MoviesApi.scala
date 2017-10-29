@@ -7,6 +7,8 @@ import com.github.cyurtoz.learn.MoviesRecommender
 import com.github.cyurtoz.model.{MovieService, Recommendation}
 import com.github.cyurtoz.utils.BearerTokenGenerator
 
+import scala.util.Success
+
 trait MoviesApi extends BearerTokenGenerator {
 
   val routes: Route =
@@ -19,24 +21,33 @@ trait MoviesApi extends BearerTokenGenerator {
         }
       }
     } ~
-      (path("train") & get) {
-        complete {
-          val mvv: Array[Recommendation] = MoviesRecommender.model
-          val mv = mvv.map(x => (MovieService.getName(x.movieId),
-            x.recommendationIds.map(z => MovieService.getName(z))))
+      pathPrefix("recommendations") {
+        pathEnd {
+          complete {
+            val recommenderModel: Array[Recommendation] = MoviesRecommender.model
 
-          mv.mkString("\n")
-        }
-      } ~
-      (path("redis") & get) {
-        complete {
-          RedisRepoImpl.save(Recommendation(1, List(1, 2, 3, 4, 5)))
-          RedisRepoImpl.save(Recommendation(2, List(6, 7, 8)))
+            RedisRepoImpl.saveAll(recommenderModel)
+            recommenderModel.mkString("\n")
+          }
+        } ~
+          path(IntNumber) { id =>
+            onComplete(RedisRepoImpl.get(id.longValue())) { comp =>
+               val response = comp match {
+                case Success(Some(v)) => v.toString
+                case _ => "Not Found"
+              }
+              complete(response)
+            }
+          } ~
+          path("titles") {
+            complete {
+              val recommenderModel: Array[Recommendation] = MoviesRecommender.model
 
-          RedisRepoImpl.get(2).toString
-
-        }
+              val mappedRecommendations = recommenderModel.map(x => (MovieService.getName(x.movieId),
+                x.recommendationIds.map(z => MovieService.getName(z))))
+              mappedRecommendations.mkString("\n")
+            }
+          }
       }
-
 }
 

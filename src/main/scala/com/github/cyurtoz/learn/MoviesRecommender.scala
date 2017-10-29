@@ -27,17 +27,18 @@ object MoviesRecommender {
     val countries = Utils.extractCountries(movies)
     val languages = Utils.extractLanguages(movies)
 
+
     val doubles = movies.map(Utils.extractMovieFeaturesVector(_, genres, countries, languages))
 
     val transposed = doubles.transpose
 
     val vectors = transposed.map(_.toArray).map(Vectors.dense)
 
-    val parVectors = context.parallelize(vectors, 10)
+    val parallelVectors = context.parallelize(vectors, 10)
 
-    parVectors.cache()
+    parallelVectors.cache()
 
-    val mat = new RowMatrix(parVectors)
+    val mat = new RowMatrix(parallelVectors)
 
     val similar = mat.columnSimilarities(0.000001d)
 
@@ -45,10 +46,9 @@ object MoviesRecommender {
 
     val grouped = similar.entries.groupBy(_.i)
 
-    val gp = grouped.map(e => (e._1, e._2.toList.sortBy(_.value)))
-    val asdr = gp.collect()
-    val gp2 = gp.map(e => Recommendation(e._1, e._2.reverse.take(5).map(me => me.j)))
+    val sortedSimilarities = grouped.map(e => (e._1, e._2.toList.sortBy(_.value)))
+    val revertedAndSliced = sortedSimilarities.map(e => Recommendation(e._1, e._2.reverse.take(5).map(me => me.j)))
 
-    gp2
+    revertedAndSliced
   }
 }
